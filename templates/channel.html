@@ -9,7 +9,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             load_messages();
             //connect websocket
-            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+            var socket = io();
             //configure connect
             socket.on('connect', function() {
                 document.querySelector('#send_msg').onclick = function() {
