@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorem ipsum</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            load_page('lorem_ipsum');
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.onclick = () => {
+                    load_page(link.dataset.page);
+                    return false;
+                };
+            });
+        });
+        function load_page(name) {
+            const request = new XMLHttpRequest();
+            console.log(request)
+            request.open('GET', `/${name}`);
+            request.onload = () => {
+                console.log('hello')
+                const response = request.responseText;
+                document.querySelector('#body').innerHTML = response;
+            };
+            request.send();
+        };
+    </script>
+</head>
+<body>
+    <ul id="nav">
+        <li><a href="" class="nav-link" data-page="lorem_ipsum">lorem ipsum</a></li>
+        <li><a href="" class="nav-link" data-page="bacon_ipsum">bacon ipsum</a></li>
+        <li><a href="" class="nav-link" data-page="cheese_ipsum">cheese ipsum</a></li>
+        <li><a href="" class="nav-link" data-page="page_test">GAMERS</a></li>
+    </ul>
+    <div id="body"></div>
+</body>
+</html>

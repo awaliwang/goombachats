@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Log in
+{% endblock %}
+
+{% block main %}
+<h1>Choose an alias</h1>
+<form action="/alias" method="POST">
+    <div class="form-group">
+        <label>Username: </label>
+        <input autocomplete="off" name="alias" placeholder="Alias" type="text">
+    </div>
+</form>
+{% endblock %}

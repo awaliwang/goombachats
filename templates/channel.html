@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ channel_name }}</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            load_messages();
+            //connect websocket
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+            //configure connect
+            socket.on('connect', function() {
+                document.querySelector('#send_msg').onclick = function() {
+                    const msg = document.querySelector('#msg_input').value;
+                    this.form.reset();
+                    socket.emit('new message', msg);
+                };
+            });
+
+            socket.on('emit message', msg_dict => {
+                const li = document.createElement('li');
+                li.innerHTML = `${msg_dict['time']} <span style="color: green;">[${msg_dict['alias']}]</span>: ${msg_dict['message']}`
+                document.querySelector('#messages').append(li);
+            });
+
+            document.querySelector('#send_msg').disabled = true;
+            document.querySelector('#msg_input').onkeyup = () => {
+                if (document.querySelector('#msg_input').value.length > 0) {
+                    document.querySelector('#send_msg').disabled = false;
+                }
+                else document.querySelector('#send_msg').disabled = true;
+            }
+        });
+        function load_messages() {
+            const request = new XMLHttpRequest();
+            request.open("GET", "/load_messages");
+            request.onload = () => {
+                const response = JSON.parse(request.responseText);
+                let msg = response['channel_msg'];
+                for (let i = 0; i < msg.length; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${msg[i]['time']} <span style="color: green;">[${msg[i]['alias']}]</span>: ${msg[i]['message']}`
+                    document.querySelector('#messages').append(li)
+                }
+                const last = document.createElement('li');
+                last.innerHTML = '<span style="font-style: italic;">Previous messages loaded above...</span>';
+                document.querySelector('#messages').append(last);
+            }
+            request.send();
+        }
+    </script>
+</head>
+<body>
+    <h1>{{ channel_name }}</h1>
+    <a href="/">Return to lobby</a>
+    <div id="chat_window">
+        <ul id="messages" style="list-style: none; display: inline-block;">
+        </ul>
+    <form id="chat" action="javascript:void(0);">
+        <input autocomplete="off" name="msg_input" placeholder="Type a message..." type="text" id="msg_input"/>
+        <button type="submit" id="send_msg">Send</button>
+    </form>
+</body>
+</html>

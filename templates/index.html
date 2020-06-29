@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flack chat</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('lol')
+            load();
+
+            // connect to websocket
+            var socket = io();
+
+            // configure buttons
+            socket.on('connect', () => {
+                document.querySelector('#create_channel').onclick = function() {
+                    const channel_name = document.querySelector('#channelName').value;
+                    this.form.reset();
+                    console.log(channel_name);
+                    socket.emit('new channel', channel_name);
+                };
+            });
+
+            socket.on('error', () => {
+                window.alert("Error! Room name already in use");
+            });
+
+            socket.on('channel list', data => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="/channel/${data}">${data}</a>`;
+                document.querySelector('#channelList').append(li)
+            });
+
+            document.querySelector('#create_channel').disabled = true;
+
+            document.querySelector('#channelName').onkeyup = () => {
+                if (document.querySelector('#channelName').value.length > 3) {
+                    document.querySelector('#create_channel').disabled = false;
+                }
+                else document.querySelector('#create_channel').disabled = true;
+            }
+
+            console.log("CHANGE IS FUCKING GOOOOOOOOD")
+        });
+        function load() {
+            const request = new XMLHttpRequest();
+            request.open("GET", "/load_channels");
+            request.onload = () => {
+                const response = JSON.parse(request.responseText);
+                let list = response['channel_list'];
+                for (let i = 0; i < list.length; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="/channel/${list[i]}">${list[i]}</a>`;
+                    document.querySelector('#channelList').append(li);
+                }
+            }
+            request.send();
+        }
+    </script>
+</head>
+<body>
+    <nav>
+        <a href="/logout">Log out</a>
+    </nav>
+    <div id="body">
+        <h1>Hello, {{ alias }}. Welcome to Flack.</h1>
+        <form action="javascript:void(0);">
+            <div class="form-group">
+                <label>Create a new channel</label>
+                <input autocomplete="off" name="channel_name" placeholder="Channel name" type="text" id="channelName">
+                <button id="create_channel" type="submit">Create</button>
+            </div>
+        </form>
+        <h3>Channel list:</h3>
+        <ul id="channelList">
+        </ul>
+    </div>
+</body>
+</html>
