@@ -7,7 +7,7 @@ from helpers import login_required
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = 'secret'
+app.config["SECRET_KEY"] = "b'jx93/xe2iw/x9a7}0N/xf1/x7fx/xd4/x94/xaf'"
 socketio = SocketIO(app)
 
 channel_list = []
